@@ -8,19 +8,57 @@ import { NeuralNetwork } from './neural-network/neural-network';
 })
 export class AppComponent implements OnInit {
   title = 'app works!';
-  nn = new NeuralNetwork();
+  nn: NeuralNetwork;
 
   ngOnInit() { debugger
-    // console.log(this.nn.dot([2, 4, 1], [2, 2, 3]));
-    // console.log(this.nn.sigmoid([0, 2, 3]));
+    const xorInput: number[][] = [
+      [0.0, 0.0],
+      [1.0, 0.0],
+      [0.0, 1.0],
+      [1.0, 1.0]
+    ];
 
-    // # The training set. We have 4 examples, each consisting of 3 input values
-    // # and 1 output value.
-    const training_set_inputs = [[0, 0, 1], [1, 1, 1], [1, 0, 1], [0, 1, 1]];
-    const training_set_outputs = [0, 1, 1, 0];
-    this.nn.train(training_set_inputs, training_set_outputs, 1000);
-    const res = this.nn.think([[1, 1, 1]]);
-    console.log('result = ' + res);
+    const xorIdeal: number[][] = [
+      [0.0], [1.0], [1.0], [0.0]
+    ];
+
+    // System.out.println("Learn:");
+    console.log('Learn:');
+
+    this.nn = new NeuralNetwork(2, 3, 1, 0.7, 0.9);
+
+    /*    NumberFormat percentFormat = NumberFormat.getPercentInstance();
+     percentFormat.setMinimumFractionDigits(4);*/
+
+
+    for (let i = 0; i < 10000; i++) {
+      for (let j = 0; j < xorInput.length; j++) {
+        this.nn.computeOutputs(xorInput[j]);
+        this.nn.calcError(xorIdeal[j]);
+        this.nn.learn();
+      }
+      /*      System.out.println( "Trial #" + i + ",Error:" +
+       percentFormat .format(network.getError(xorInput.length)) );*/
+      console.log(
+        'Trial #' + i + ', Error: ' +
+        this.nn.getError(xorInput.length)
+      );
+    }
+
+    // System.out.println("Recall:");
+    console.log('Recall:');
+
+    for (let i = 0; i < xorInput.length; i++) {
+
+      for (let j = 0; j < xorInput[0].length; j++) {
+        // System.out.print( xorInput[i][j] +":" );
+        console.log(xorInput[i][j] + ' : ');
+      }
+
+      const out: number[] = this.nn.computeOutputs(xorInput[i]);
+      // System.out.println("="+out[0]);
+      console.log(' = ' + out[0]);
+    }
   }
 
 }
